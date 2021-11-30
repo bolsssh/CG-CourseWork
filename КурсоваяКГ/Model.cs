@@ -61,17 +61,13 @@ namespace КурсоваяКГ
                     if (line.StartsWith("f"))
                     {
                         var info = line.Split(' ');
-                        var pol = new Polygon();
-                        double z = 0;
+                        var points = new List<Vector>();
                         for (var i = 1; i < info.Length; i++)
                         {
-                            var dot = Coordinates[int.Parse(info[i].Split('/')[0]) - 1];
-                            z += dot.Z;
-                            pol.dots.Add(dot);
+                            var point = Coordinates[int.Parse(info[i].Split('/')[0]) - 1];
+                            points.Add(point);
                         }
-
-                        pol.Z = z / 4;
-                        Polygons.Add(pol);
+                        Polygons.Add(new Polygon(points));
                     }
                 }
             }
@@ -104,10 +100,7 @@ namespace КурсоваяКГ
                 {
                     if (Polygons[i].Z < Polygons[i + 1].Z)
                     {
-                        var t = Polygons[i];
-                        Polygons[i] = Polygons[i + 1];
-                        Polygons[i + 1] = t;
-                        // (Polygons[i], Polygons[i + 1]) = (Polygons[i + 1], Polygons[i]);
+                        (Polygons[i], Polygons[i + 1]) = (Polygons[i + 1], Polygons[i]);
                         flag = true;
                     }
                 }
@@ -119,9 +112,8 @@ namespace КурсоваяКГ
             var pols = new List<Polygon>();
             foreach (var pol in Polygons)
             {
-                var newPol = new Polygon();
-                newPol.Z = pol.Z;
-                foreach (var dot in pol.dots)
+                var points = new List<Vector>();
+                foreach (var dot in pol.Points)
                 {
                     var temp = dot;
                     var newDot = new Vector()
@@ -130,10 +122,10 @@ namespace КурсоваяКГ
                         Y = (matrix.arr[1, 0] * temp.X) + (matrix.arr[1, 1] * temp.Y) + (matrix.arr[1, 2] * temp.Z) + matrix.arr[1, 3],
                         Z = (matrix.arr[2, 0] * temp.X) + (matrix.arr[2, 1] * temp.Y) + (matrix.arr[2, 2] * temp.Z) + matrix.arr[2, 3],
                     };
-                    newPol.dots.Add(newDot);
+                    points.Add(newDot);
                 }
 
-                pols.Add(newPol);
+                pols.Add(new Polygon(points));
             }
 
             Polygons = pols;

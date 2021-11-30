@@ -88,11 +88,6 @@ namespace КурсоваяКГ
         {
             var matrix = new Matrix();
             var angle = Math.PI * degree / 180;
-            //var sinSign = 1;
-            if (degree > 180)
-            {
-
-            }
             matrix.arr[0, 0] = Math.Cos(angle) ;
             matrix.arr[0, 2] = -Math.Sin(angle);
             matrix.arr[1, 1] = 1;

@@ -22,7 +22,7 @@ namespace КурсоваяКГ
                     _degree -= 360;
                 if (_degree <= -360)
                     _degree += 360;
-                ChangeMatrix(value);
+                ChangeModelView(value);
             }
         }
 
@@ -37,7 +37,7 @@ namespace КурсоваяКГ
             model.Sort();
 
             _mt = GetMatrixView(windowSize);
-            ChangeMatrix(_degree);
+            ChangeModelView(_degree);
         }
 
         private Matrix GetMatrixView(Size windowSize)
@@ -54,23 +54,25 @@ namespace КурсоваяКГ
             return mt;
         }
 
-        private void ChangeMatrix(int degree)
+        private void ChangeModelView(int degree)
         {
             tModel = new Model(model);
+
             tModel.Change(_mt * Matrix.Turn(degree));
         }
 
         public void DrawScene(Graphics graphics)
         {
             graphics.Clear(Color.White);
-            var pols = Math.Abs(180-Math.Abs(Degree))<=90 ? 
-                tModel.Polygons.OrderBy(p => p.Z).ToList() : tModel.Polygons;
-
+            var pols = tModel.Polygons.OrderBy(p => p.Z).ToList();
+            var max = tModel.Polygons.Max(p => p.Z);
+            var min = tModel.Polygons.Min(p => p.Z);
+            var exp = 255 / (max - min);
             foreach (var pol in pols)
             {
-                var a = (int)(pol.Z);
-                var brush = new SolidBrush(Color.FromArgb(100 + 5 * a, 100 + 5 * a, 100 + 5 * a));
-                graphics.FillPolygon(brush, pol.ToPointFArray());
+                var a = (int)((pol.Z - min) * exp);
+                var brush = new SolidBrush(Color.FromArgb(a, a, a));
+                graphics.FillPolygon(brush, pol.Points.Select(p => p.ToPointF()).ToArray());
             }
         }
     }
