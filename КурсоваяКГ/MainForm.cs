@@ -41,7 +41,7 @@ namespace КурсоваяКГ
             CenterToParent();
             myBitmap = new Bitmap(width, height);
             var graphics = Graphics.FromImage(myBitmap);
-            painter.DrawScene(graphics);
+            painter.DrawScene(graphics,0);
             BackgroundImage = myBitmap;
         }
         protected override void OnKeyDown(KeyEventArgs e)

@@ -61,18 +61,30 @@ namespace КурсоваяКГ
             tModel.Change(_mt * Matrix.Turn(degree));
         }
 
-        public void DrawScene(Graphics graphics)
+        public void DrawScene(Graphics graphics, int rasterizationSize)
         {
+            var grisSize = 5;
+            var rasterizer = new Rasterizer(grisSize);
             graphics.Clear(Color.White);
             var pols = tModel.Polygons.OrderBy(p => p.Z).ToList();
             var max = tModel.Polygons.Max(p => p.Z);
             var min = tModel.Polygons.Min(p => p.Z);
-            var exp = 255 / (max - min);
+            var exp = 240 / (max - min);
+
             foreach (var pol in pols)
             {
                 var a = (int)((pol.Z - min) * exp);
                 var brush = new SolidBrush(Color.FromArgb(a, a, a));
                 graphics.FillPolygon(brush, pol.Points.Select(p => p.ToPointF()).ToArray());
+                if (rasterizationSize == 0) continue;
+                for (var i = 1; i < pol.Points.Count; i++)
+                {
+                    var plots = rasterizer.RastorizeWithCda(new Point((int)pol.Points[i].X, (int)pol.Points[i].Y),
+                        new Point((int)pol.Points[i - 1].X, (int)pol.Points[i - 1].Y));
+                    foreach (var p in plots)
+                        graphics.FillRectangle(brush, p.X * grisSize + 1, p.Y * grisSize + 1,
+                            (int)pol.Z / 100 * grisSize, (int)pol.Z / 100 * grisSize);
+                }
             }
         }
     }
